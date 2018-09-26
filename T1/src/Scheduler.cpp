@@ -1,7 +1,6 @@
 #include "../include/Scheduler.h"
 
 using namespace std;
-// implementar operador <
 
 //Alta prioridade:	Processos novos, processos que voltam do I/O (fita,impressora)
 //Baixa prioridade:	Processos que retornam do Disco, processos que sofreram preempcao.
@@ -17,8 +16,6 @@ void* Schedulling(void* args){
 
 	while(true){
 		if(finished.size() == MAX_P) break;
-
-
 
 		pthread_mutex_lock(&l0);
 		Process a;
@@ -140,7 +137,8 @@ void* CreateProcess(void *args)
 	pthread_mutex_unlock(&l1);
 	a.status = NOVO;
 	a.tempo_servico = rand() % 5 ;
-	a.tempo_io = (rand()%2)*( rand()%(a.tempo_servico) );
+	if(a.tempo_servico != 0)
+		a.tempo_io = (rand()%2)*(  rand()%(a.tempo_servico)  );
 	a.tipo_io = rand()%5;
 
 	printf("CRIANDO PROCESSO pid:%d\n",a.pid);

@@ -5,7 +5,7 @@
 #include <sys/types.h>
 #include <time.h>
 #include <pthread.h>
-#define MAX_P 			1
+#define MAX_P 			11
 
 #define T_DISCO 		4
 #define T_FITA  		4 
