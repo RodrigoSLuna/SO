@@ -1,0 +1,45 @@
+Gerência de Processos
+
+->PCB 
+	-> Contexto de hardware ( Não é necessário )
+	-> Contexto de Software (prioridade,PID,PPID,status)
+	-> Espaço de endereçamento 
+
+->Scheduler
+	->3 filas:
+		-> 2 filas: (1)Alta(Novos) e (2)Baixa prioridade(CPU BOUNDED).
+		-> (3)fila (I/O).
+			-> Disco		->> retorna para fila 2
+			-> Fita			->> retorna para fila 1
+			-> Impressora	->> retorna para fila 1
+
+Ordem de entrada na fila de prontos
+->	Novos -> fila 1
+->	I/O -> depende do I/O
+->	preemptados -> fila 2
+
+
+
+Monitoramento:
+
+
+
+
+Premissas:
+-> Limite de #processos
+-> Fatia de Tempo
+-> Tempo de Chegada
+-> Tempo de serviço					ALEATÓRIO
+-> Tempos de I/O e tipo de I/O		ALEATÓRIO
+
+
+Estimativa:
+
+Processo A precisa de 15 unidades.
+		I/O -> 2, 7, 8
+
+
+Tempos de duração de I/O
+---- Disco --? Ut
+---- Fita  --? Ut
+---- Imp   --? Ut
