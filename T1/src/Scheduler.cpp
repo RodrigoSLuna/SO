@@ -68,7 +68,7 @@ void* Schedulling(void* args){
 				// solicita IO
 			else{
 					//ta feio
-				while(a.tempo_chegada < a.tempo_io) a.tempo_chegada++;
+				while(a.tempo_chegada <= a.tempo_io) a.tempo_chegada++;
 				a.status = IO;
 				printf("Processo solicita IO\n");
 				IO_queue.push( a );
@@ -119,7 +119,7 @@ void* Schedulling(void* args){
 				printf("PROCESSO SOLICITA IO\n");
 				printf("Tempo de chegada: %d\n",a.tempo_chegada);
 					//ta feio
-				while(a.tempo_chegada < a.tempo_io) a.tempo_chegada++;
+				while(a.tempo_chegada <= a.tempo_io) a.tempo_chegada++;
 				a.status = IO;
 				IO_queue.push( a );
 			}
