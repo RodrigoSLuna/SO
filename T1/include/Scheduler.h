@@ -6,7 +6,7 @@
 #include <time.h>
 #include <pthread.h>
 #include <set>
-#define MAX_P 			10
+#define MAX_P 			  1
 #define TEMPO_MAX_SERVICO 5
 
 
@@ -25,7 +25,7 @@
 #define PRONTO		3
 #define FINISHED 	4
 
-#define time_slice 1
+#define time_slice  1
 // estados novo, io, preemptado, 0,1,2 
 void *CreateProcess(void **args);
 

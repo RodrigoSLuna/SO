@@ -22,19 +22,16 @@ pthread_mutex_t l1 = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t io_lock[4] = {PTHREAD_MUTEX_INITIALIZER};
 int PID;
 
-int tempo_exec;
-typedef pair<int,int> io_Process; // IO do processo 
-
 void* IO_Schedulling_DISCO(void* args){
 	while(true){
 		if(finished.size()== MAX_P ) break;
 		Process a;
 		
-		if(IO_queue[DISCO].size() == 1) printf("EH UM\n");
+		if(IO_queue[DISCO].size() == 1) 
 		pthread_mutex_lock(&io_lock[DISCO]);
 		if(!IO_queue[DISCO].empty())
 		{
-			printf("Retirou da fila da DISCO\n");
+			printf("Retirou o processo de pid: %d da fila da DISCO\n",a.pid);
 			a = IO_queue[DISCO].front();
 			IO_queue[DISCO].pop();
 		}
@@ -45,9 +42,9 @@ void* IO_Schedulling_DISCO(void* args){
 			
 		}
 		pthread_mutex_unlock(&io_lock[DISCO]);
-		printf("Processo solicitou DISCO\n \t DISCO EXECUTANDO \n");
+		printf("Processo de pid: %d solicitou DISCO\n \t DISCO EXECUTANDO \n",a.pid);
 		sleep(T_DISCO);
-		printf("Processo volta do Disco\n \t RETORNO DO DISCO \n");
+		printf("Processo de pid: %d volta do Disco\n \t RETORNO DO DISCO \n",a.pid);
 		pthread_mutex_lock(&l0);
 	
 		a.status=PRONTO;
@@ -60,18 +57,19 @@ void* IO_Schedulling_DISCO(void* args){
 }
 
 void* IO_Schedulling_IMPRESSORA(void* args){
-	while(true){
+	while(true)
+	{
 		if(finished.size() == MAX_P ) break;
 		Process a;
 		pthread_mutex_lock(&io_lock[IMPRESSORA]);
 		if(IO_queue[IMPRESSORA].size() == 1)
-		printf("Consegui o Lock: %d\n", IO_queue[IMPRESSORA].size());
+		printf("Consegui o Lock: %d\n",IO_queue[IMPRESSORA].size());
 		if(!IO_queue[IMPRESSORA].empty())
 		{
-			printf("Retirou da fila da IMPRESSORA\n");
+			printf("Retirou o processo de pid: %d da fila da IMPRESSORA\n",a.pid);
 			a =	IO_queue[IMPRESSORA].front();
 			IO_queue[IMPRESSORA].pop();
-			printf("Retirou da fila");
+			printf("Retirou retirou o processo de pid: %d da fila da IMPRESSORA\n",a.pid);
 
 		}
 		else
@@ -81,9 +79,9 @@ void* IO_Schedulling_IMPRESSORA(void* args){
 			
 		}
 		pthread_mutex_unlock(&io_lock[IMPRESSORA]);
-		printf("Processo solicitou IMPRESSORA\n \t IMPRESSORA EXECUTANDO \n");
+		printf("Processo de pid: %d solicitou IMPRESSORA\n \t IMPRESSORA EXECUTANDO \n",a.pid);
 		sleep(T_IMPRESSORA);
-		printf("Processo volta da IMPRESSORA\n \t RETORNO DA IMPRESSORA \n");
+		printf("Processo de pid: %d volta da IMPRESSORA\n \t RETORNO DA IMPRESSORA \n",a.pid);
 		pthread_mutex_lock(&l0);
 	
 		a.status=PRONTO;
@@ -94,13 +92,14 @@ void* IO_Schedulling_IMPRESSORA(void* args){
 	}
 }
 void* IO_Schedulling_FITA(void* args){
-	while(true){
+	while(true)
+	{
 		if(finished.size()== MAX_P ) break;
 		Process a;
 		pthread_mutex_lock(&io_lock[FITA]);
 		if(!IO_queue[FITA].empty())
 		{
-			printf("Retirou da fila da FITA\n");
+			printf("Retirou o processo de pid: %d da fila da FITA\n",a.pid);
 			a=IO_queue[FITA].front();
 			IO_queue[FITA].pop();
 		}
@@ -112,9 +111,9 @@ void* IO_Schedulling_FITA(void* args){
 		}
 		
 		pthread_mutex_unlock(&io_lock[FITA]);
-		printf("Processo solicitou FITA\n \t FITA EXECUTANDO \n");
+		printf("Processo de pid: %d solicitou FITA\n \t FITA EXECUTANDO \n",a.pid);
 		sleep(T_FITA);
-		printf("Processo volta da FITA\n RETORNO DA FITA \n");
+		printf("Processo de pid: %d volta da FITA\n RETORNO DA FITA \n",a.pid);
 		pthread_mutex_lock(&l0);
 
 		a.status=PRONTO;
@@ -128,87 +127,124 @@ void* IO_Schedulling_FITA(void* args){
 //Matar o escalonador, quando produzir todas as threads.
 void* Schedulling(void* args){
 
-	while(true){
+	while(true)
+	{
+		// se todos os processos forem adicionados a fila dos terminados, entao termina a thread
 		if(finished.size() == MAX_P) break;
 
+		// secao critica
 		pthread_mutex_lock(&l0);
 		Process a;
-		if( !High_queue.empty() ){
-			puts("Retirou da fila High_queue");
+		//se a fila de alta prioridade nao tiver vazia, retira o processo dessa fila e o escalona
+		if( !High_queue.empty() )
+		{
+			printf("Retirou o processo de pid %d da fila High_queue\n",a.pid);
 			a = High_queue.front();
 			//puts("DESEMPILHOU");
 			High_queue.pop();
 		}
 		//Fila de IO errada.
-		else if(!Low_queue.empty()){
-			puts("Retirou da fila LOW_queue");
+		//se nao, retira o elemento da fila de baixa prioridade, e o escalona
+		else if(!Low_queue.empty())
+		{
+			printf("Retirou o processo de pid %d  da fila LOW_queue\n",a.pid);
 			a = Low_queue.front();
 			Low_queue.pop();
 		}
-		else {
+		else 
+		{
 			pthread_mutex_unlock(&l0);
 			continue;
 		}
 		pthread_mutex_unlock(&l0);
-
+		// cria um pair para ve o tipo e o tempo de io do processo
 		pair<int,int> a_io = make_pair(0,0);
-		//Processo eh novo
-		if(a.status == NOVO || a.status == PRONTO){
-			printf("(NOVO OU PRONTO): Escalonando o processo id:%d\n", a.pid );
+		//se o processo eh novo ou esta em estado de pronto escalona ele primeiro
+		if(a.status == NOVO || a.status == PRONTO)
+		{
+			printf("(NOVO OU PRONTO): Escalonando o processo de pid: %d\n", a.pid );
 			printf("pid: %d Tempo de chegada: %d\n",a.pid,a.tempo_chegada);
+
+
 				// n pede IO nessa fatia de tempo
+			// verifica se os ios acabaram
 			if( a.IO_queue.begin() != a.IO_queue.end() )
 				a_io = *(a.IO_queue.begin()); // retiro a solicitacao de IO
 			// possivel segfault, segunda condition
-			if(  !( !a.IO_queue.empty() and a.tempo_chegada <= a_io.first and a.tempo_chegada+time_slice >= a_io.first ) ){
-				//processo sofre preempcao
-				if(a.tempo_chegada + time_slice < a.tempo_servico ){
-					// processo volta pra fila.
+			//se ainda possui io, e o tempo de chegada do processo e menor ou igual o tempo de io do processo
+			// e o tempo de chegada do processo + a fatia de tempo e maior ou igual ao tempo do IO, entao
+			// o processo sofre preempcao
+			if(  !( !a.IO_queue.empty() and a.tempo_chegada <= a_io.first and a.tempo_chegada+time_slice >= a_io.first ) )
+			{
+				//se o tempo de chegada mais a fatia de tempo e menor que o tempo de servico entao
+				// o processo sofre preempcao
+				if(a.tempo_chegada + time_slice < a.tempo_servico )
+				{
+
+					//adiciono o tempo de chegada mais a fatia de tempo
 					a.tempo_chegada += time_slice;
+					// mudo o status do processo para preemptado
 					a.status = PREEMPTADO;
-					printf("Processo sofreu preempcao %d\n",a.pid);
+					printf("Processo sofreu preempcao de pid = %d\n",a.pid);
+					// processo volta pra fila
+					// secao critica
 					pthread_mutex_lock(&l0);
-					Low_queue.push( a  );
+					Low_queue.push(  a  );
 					pthread_mutex_unlock(&l0);
 
 				}
-				//processo finaliza
-				else{
-					printf("\t \tProcesso finalizou %d\n",a.pid);
+				//se nao o processo finaliza
+				else
+				{
+					printf("\t \tProcesso finalizou de pid = %d\n",a.pid);
+					// muda o status do processo para terminado	
 					a.status = FINISHED;
+					//SECAO CRITICA
 					pthread_mutex_lock(&l0);
+					// coloca o processo na fila de terminados 
 					finished.push( a );
 					pthread_mutex_unlock(&l0);
 
 				}
 			}
-				// solicita IO
-			else{
+			// solicita IO
+			//se o processo nao sofre preempcao
+			// verifica se os ios acabaram
+			else
+			{
 				//ta feio
-				if(a.IO_queue.begin() != a.IO_queue.end() ){	
+				if(a.IO_queue.begin() != a.IO_queue.end() )
+				{	
 					a_io = *(a.IO_queue.begin()); // retiro a solicitacao de IO
 					a.IO_queue.erase( a.IO_queue.begin() ); // retiro a solicitacao de IO da queue do processo
 				}
-
+				// adiciona  no tempo de chegada do processo quanto ele precisa usar do io que ele tem
 				while(a.tempo_chegada <= a_io.first ) a.tempo_chegada++;
-				a.status = IO;							//mudo o status do processo para requisicao de IO
-				printf("Processo solicita IO 1, %d\n",a.pid);
-				pthread_mutex_lock(&io_lock[ a_io.second ]);	// destravo o lock para aquela fila de IO solicitada
-				printf("TIPO DE IO: %d, pid: %d:\n",a_io.second,a.pid);
 				
+				// muda o status do processo, fazendo com que ele solicite IO
+				a.status = IO;
+				//mudo o status do processo para requisicao de IO
+				printf("Processo solicita IO 1,pid: %d\n",a.pid);
+				pthread_mutex_lock(&io_lock[ a_io.second ]);	// destravo o lock para aquela fila de IO solicitada
+				printf("TIPO DE IO: %d, pid: %d\n",a_io.second,a.pid);
+				// coloca o processo na fila de io dele
 				IO_queue[a_io.second].push( a );	
 				
 				pthread_mutex_unlock(&io_lock[a_io.second ]);	// destravo o lock para aquela fila de IO solicitada
 			}
 			sleep(2);	
 		}
-		//Processo esta em IO ou em estado de preempcao
-		else{
-			printf("(PREEMPTADO): Escalonando o processo id:%d\n", a.pid );
+		//Se processo esta em IO ou em estado de preempcao
+		else
+		{
+			printf("(PREEMPTADO): Escalonando o processo pid: %d\n", a.pid );
 			printf("Tempo de chegada: %d, pid:%d, io_first %d:  \n",a.tempo_chegada,a.pid,a_io.first);
 			
-			//logica errada caralho
-			if( !( !a.IO_queue.empty() and a.tempo_chegada <= a_io.first and a.tempo_chegada+time_slice >= a_io.first )  ){
+			//se ainda possui io, e o tempo de chegada do processo e menor ou igual o tempo de io do processo
+			// e o tempo de chegada do processo + a fatia de tempo e maior ou igual ao tempo do IO, entao
+			// o processo sofre preempcao
+			if( !( !a.IO_queue.empty() and a.tempo_chegada <= a_io.first and a.tempo_chegada+time_slice >= a_io.first )  )
+			{
 				//processo sofre preempcao
 				if(a.tempo_chegada + time_slice < a.tempo_servico ){
 						// processo volta pra fila.
@@ -221,22 +257,25 @@ void* Schedulling(void* args){
 
 				}
 					//processo finaliza
-				else{
+				else
+				{
 					printf("\t \t PROCESSO FINALIZA pid: %d\n",a.pid);
 					a.status = FINISHED;
 					finished.push( a );
 				}
 
 			}			// solicita IO
-			else{
+			else
+			{
 			//ta feio
-				if(a.IO_queue.begin() != a.IO_queue.end() ){	
+				if(a.IO_queue.begin() != a.IO_queue.end() )
+				{	
 					a_io = *(a.IO_queue.begin()); // retiro a solicitacao de IO
 					a.IO_queue.erase( a.IO_queue.begin() ); // retiro a solicitacao de IO da queue do processo
 				}
 				while(a.tempo_chegada <= a_io.first ) a.tempo_chegada++;
 				a.status = IO;							//mudo o status do processo para requisicao de IO
-				printf("Processo solicita IO 2 pid:%d\n",a.pid);
+				printf("Processo solicita IO 2 pid: %d\n",a.pid);
 				pthread_mutex_lock(&io_lock[ a_io.second ]);	// destravo o lock para aquela fila de IO solicitada
 				IO_queue[a_io.second].push( a );	
 				pthread_mutex_unlock(&io_lock[a_io.second ]);	// destravo o lock para aquela fila de IO solicitada
@@ -246,7 +285,7 @@ void* Schedulling(void* args){
 	}
 }
 
-
+// gera os tempos aleatorios  dos tipos de IO
 void gen(pair<int,int> &D, pair<int,int>&F, pair<int,int > &I,int time){
 
 	set<int> cnj;
@@ -295,52 +334,59 @@ void gen(pair<int,int> &D, pair<int,int>&F, pair<int,int > &I,int time){
 
 void* CreateProcess(void *args)
 {	
-
+	// cria o processo a
 	Process a;
+
+	//regiao critica do processo
 	pthread_mutex_lock(&l1);
 	a.pid = PID++;
 	pthread_mutex_unlock(&l1);
+	// seta o status do processo como novo
 	a.status = NOVO;
+	// escolhe randomicamente o tempo de servico do processo
 	a.tempo_servico = (rand() % TEMPO_MAX_SERVICO) + 1 ;
 	
-	
+	// cria um pair para cada tipo de IO
 	pair<int,int> io_DISCO,io_FITA,io_IMPRESSORA;
 
 	//Cria o tempo de disco
 	gen(io_DISCO,io_FITA,io_IMPRESSORA, a.tempo_servico);
-	set<pair<int,int>> nothing;
-
+	// cria um set 
+	set< pair < int,int > > nothing;
+ 
 	( rand()%2 == 0 or io_DISCO.first ==0) ? nothing.insert(io_DISCO) : a.IO_queue.insert( io_DISCO  );
-	( rand()%2 == 0 or io_FITA.first ==0) ? nothing.insert(io_FITA) : a.IO_queue.insert( io_FITA  );
-	( rand()%2 == 0 or io_IMPRESSORA.first ==0)? nothing.insert(io_IMPRESSORA) : a.IO_queue.insert( io_IMPRESSORA  );
+	( rand()%2 == 0 or io_FITA.first ==	0) ? nothing.insert(io_FITA) : a.IO_queue.insert( io_FITA  );
+	( rand()%2 == 0 or io_IMPRESSORA.first ==0	)? nothing.insert(io_IMPRESSORA) : a.IO_queue.insert( io_IMPRESSORA  );
 
-
-	printf("CRIANDO PROCESSO pid:%d\n",a.pid);
-	printf("TEMPO DE SERVICO: %d\n",a.tempo_servico);
+	// imprime o pid do processo criado
+	printf("CRIANDO PROCESSO pid: %d\n",a.pid);
+	// imprime o tempo de servico do processo
+	printf("Processo de pid: %d : Tempo de servico: %d\n",a.pid,a.tempo_servico);
+	// se na hora de escolher o io aleatorio 
 	if(a.IO_queue.empty()) printf("SEM IO\n");
+	// imprime o tempo do io e o tipo do io
 	for(auto v:a.IO_queue){
 		printf("tempo:%d, IO:%d\n",v.first,v.second);
 	}
+
+
 	pthread_mutex_lock(&l0);
+
+	// coloca o processo novo na fila alta de prioridade
 	High_queue.push(a);
-	puts("EMPILHOU");
+	printf("EMPILHOU o processo de pid: %d\n",a.pid);
 	pthread_mutex_unlock(&l0);
 }
 
 
-
-
-
-
-
 int main(){
+	std::srand(std::time(0));
 	void* retval;
 	pthread_t Create_P;
 	pthread_t Scheduler;
 	pthread_t IO_Scheduler_FITA;
 	pthread_t IO_Scheduler_IMPRESSORA;
 	pthread_t IO_Scheduler_DISCO;
-	pthread_t Monitor;
 
 	if( pthread_create(&Scheduler, NULL, Schedulling, NULL ) ){
 		puts("ERRO NA CRIACAO DA THREAD Escalonador");
@@ -375,15 +421,5 @@ int main(){
 	pthread_join(IO_Scheduler_DISCO, &retval);
 	pthread_join(IO_Scheduler_FITA, &retval);
 
-
-
-/*
-	if( pthread_create(Scheduler, NULL, Monitoring, NULL ) ){
-		puts("ERRO NA CRIACAO DA THREAD Monitor");
-		exit(0);
-	}
-*/
-	
-	//pthread.join(Monitor, &retval);
 	return 0;
 }
