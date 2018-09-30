@@ -1,3 +1,4 @@
+#include <fstream>
 #include <iostream>
 #include <thread>
 #include <queue>
@@ -6,7 +7,7 @@
 #include <time.h>
 #include <pthread.h>
 #include <set>
-#define MAX_P 			  1
+#define MAX_P 			  10
 #define TEMPO_MAX_SERVICO 5
 
 
