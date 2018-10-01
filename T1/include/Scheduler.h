@@ -1,3 +1,5 @@
+#include <vector>
+#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <thread>
@@ -7,7 +9,7 @@
 #include <time.h>
 #include <pthread.h>
 #include <set>
-#define MAX_P 			  10
+#define MAX_P 			  2
 #define TEMPO_MAX_SERVICO 5
 
 
@@ -39,6 +41,8 @@ struct Process
  	// tempo e o tempo que o processo demora, tempo_io e o tempo que ele roda no io
  	// tempo_chegada: tempo em que o processo entra para a execucao, e total de fatia de tempo ja executada
  	int tempo_servico,tempo_chegada = 1;
+ 	//tempo em que o processo inicia a execucao
+ 	int tempo_inicio,tempo_fim;
  	// 0 io, 1 fita,2 impressora
  	std::set< std::pair< TEMPO_IO, TIPO_IO > > IO_queue;
 };
