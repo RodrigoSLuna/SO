@@ -1,0 +1,58 @@
+Criando processo ID: 0
+Tempo de servico: 4
+Tempo: 4 IO: 3
+
+
+Criando processo ID: 1
+Tempo de servico: 3
+Tempo: 1 IO: 1
+Tempo: 3 IO: 3
+
+
+Criando processo ID: 2
+Tempo de servico: 5
+Tempo: 1 IO: 1
+
+
+Criando processo ID: 3
+Tempo de servico: 5
+Tempo: 1 IO: 1
+Tempo: 5 IO: 3
+
+
+Criando processo ID: 4
+Tempo de servico: 3
+Tempo: 1 IO: 1
+Tempo: 2 IO: 2
+
+
+Criando processo ID: 5
+Tempo de servico: 3
+Tempo: 2 IO: 2
+Tempo: 3 IO: 3
+
+
+Criando processo ID: 6
+Tempo de servico: 4
+Tempo: 2 IO: 1
+Tempo: 3 IO: 2
+
+
+Criando processo ID: 7
+Tempo de servico: 5
+Tempo: 2 IO: 1
+Tempo: 5 IO: 3
+
+
+Criando processo ID: 8
+Tempo de servico: 2
+SEM IO
+
+
+
+Criando processo ID: 9
+Tempo de servico: 1
+SEM IO
+
+
+
