@@ -285,8 +285,10 @@ void* Schedulling(void* args){
 				
 				printf("\tPID: %d Tempo de Fim da execucao: %d\n",a.pid ,tempo_execucao);
 
+
+				string tipo_io = a_io.second == 1? " DISCO " : a_io.second == 2? " FITA " : " IMPRESSORA ";
 				Schedulling << "PID " << a.pid << " Tempo de Final da fatia de tempo " << tempo_execucao<< endl 
-					<< " Processo Requisitou IO " << a_io.second  << endl << endl;
+					<< " Processo Requisitou IO " << tipo_io  << endl << endl;
 
 				// muda o status do processo, fazendo com que ele solicite IO
 				a.status = IO;
@@ -339,6 +341,7 @@ void* Schedulling(void* args){
 					printf("\tPID: %d Tempo de Fim da execucao: %d\n",a.pid ,tempo_execucao);
 					printf("\t \t PROCESSO FINALIZA pid: %d\n",a.pid);
 					
+
 					Schedulling << "PID " << a.pid << " Tempo de Final da fatia de tempo " << tempo_execucao<< endl 
 					<< " Terminou "<< endl << endl;
 
@@ -361,8 +364,9 @@ void* Schedulling(void* args){
 					tempo_execucao++;
 				}
 				
+				string tipo_io = a_io.second == 1? " DISCO " : a_io.second == 2? " FITA " : " IMPRESSORA ";
 				Schedulling << "PID " << a.pid << " Tempo de Final da fatia de tempo " << tempo_execucao<< endl 
-				<< " Requisitou IO " << a_io.second  << endl << endl;
+					<< " Processo Requisitou IO " << tipo_io  << endl << endl;
 
 
 				printf("\tPID: %d Tempo de Fim da execucao: %d\n",a.pid ,tempo_execucao);

@@ -9,7 +9,7 @@
 #include <time.h>
 #include <pthread.h>
 #include <set>
-#define MAX_P 			  2
+#define MAX_P 			  1
 #define TEMPO_MAX_SERVICO 5
 
 
