@@ -23,13 +23,12 @@
 #define IMPRESSORA 	3
 
 #define NOVO 		0
-#define IO 			1
-#define PREEMPTADO 	2
-#define PRONTO		3
-#define FINISHED 	4
+#define IO 			1	//bloqueado
+#define PRONTO		2
+#define FINISHED 	3
 
 #define time_slice  1
-// estados novo, io, preemptado, 0,1,2 
+
 void *CreateProcess(void **args);
 
 typedef int TIPO_IO;
